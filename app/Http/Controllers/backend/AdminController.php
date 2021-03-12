@@ -2,27 +2,26 @@
 
 namespace App\Http\Controllers\backend;
 
-use DB;
-use Auth;
-use Carbon\Carbon;
-use App\model\Server;
-use App\model\stream;
-use App\model\liveadd;
+use App\Http\Controllers\Controller;
 use App\Model\backend\User;
 use App\model\bannerliveadd;
-use App\model\Premiumserver;
-use Illuminate\Http\Request;
 use App\model\fieldmeta_value;
-use App\model\Textad as MTextad;
-use App\Http\Controllers\Controller;
+use App\model\liveadd;
+use App\model\Premiumserver;
+use App\model\review;
+use App\model\Server;
 use App\model\Server as modelServer;
+use App\model\stream;
+use App\model\Textad as MTextad;
+use Auth;
+use Carbon\Carbon;
+use DB;
+use Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use Intervention\Image\ImageManagerStatic as Image;
-use App\model\review;
 use Validator;
-use Hash;
-
 
 class AdminController extends Controller
 {
@@ -52,7 +51,7 @@ class AdminController extends Controller
         $server_count = modelServer::where('delete_flag', 0)->get();
         $payment_count = DB::table('paymenttokens')
         ->join('l2hotzone_devDb_members', 'l2hotzone_devDb_members.id_member', '=', 'paymenttokens.user_id')
-        ->where('l2hotzone_devDb_members.delete_flag','=',0)
+        ->where('l2hotzone_devDb_members.delete_flag', '=', 0)
         ->get();
         $count['server_count'] = $banner_count->count();
         $count['banner_count'] = $server_count->count();
@@ -68,9 +67,7 @@ class AdminController extends Controller
 
     public function server_list()
     {
-        $servers = modelServer::join('l2hotzone_devDb_members as member', 'member.id_member', '=', 'servers.user_id')->where('servers.delete_flag','=',0)->where('member.delete_flag','=',0)->get()->toArray();
-
-       
+        $servers = modelServer::join('l2hotzone_devDb_members as member', 'member.id_member', '=', 'servers.user_id')->where('servers.delete_flag', '=', 0)->where('member.delete_flag', '=', 0)->get()->toArray();
 
         return view('backend.list', ['servers'=>$servers]);
     }
@@ -84,35 +81,29 @@ class AdminController extends Controller
 
     public function server_update(Request $request)
     {
-        if($request->servertype_1 == 3)
-        {
-            DB::table('uptime_history')->insert(['server_id' => $id,'first_section_status' => 1,'second_section_status' => 1,'created_at'=> date('Y-m-d')]);
+        if ($request->servertype_1 == 3) {
+            DB::table('uptime_history')->insert(['server_id' => $id, 'first_section_status' => 1, 'second_section_status' => 1, 'created_at'=> date('Y-m-d')]);
         }
-        if($request->servertype_1 == 1 && $request->date == NULL)
-        {
-            return redirect()->back()->with('errordate','Please Select Comming Soon Date');
+        if ($request->servertype_1 == 1 && $request->date == null) {
+            return redirect()->back()->with('errordate', 'Please Select Comming Soon Date');
+        } else {
+            $server = new modelServer;
+            $server->id = $request->id;
+            $id = $request->id;
+            //dd($request->all());die;
+            modelServer::findOrFail($id)->update($request->all());
+
+            /* echo "dd";die;
+             $server->user_id = $request->user_id;
+             $server->fill($request->all());
+             if(!$server->save()) App::abort(500, 'Error');
+             $metaField = array_intersect_key($request->all() ,
+             array_flip(["SPrate", "NPCbuffer", "GlobalGK", "Customzone", "Customweapon", "Customarmor", "Offlineshop"] ));
+             $server->metaField()->createMany($this->array_combine_(array_keys($metaField),array_values($metaField)));*/
+            $servers = modelServer::join('l2hotzone_devDb_members as member', 'member.id_member', '=', 'servers.user_id')->where('servers.delete_flag', '=', 0)->where('member.delete_flag', '=', 0)->get()->toArray();
+
+            return view('backend.list', ['servers'=>$servers]);
         }
-        else{
-
-        $server = new modelServer;
-        $server->id = $request->id;
-        $id = $request->id;
-        //dd($request->all());die;
-        modelServer::findOrFail($id)->update($request->all());
-
-        /* echo "dd";die;
-         $server->user_id = $request->user_id;
-         $server->fill($request->all());
-         if(!$server->save()) App::abort(500, 'Error');
-         $metaField = array_intersect_key($request->all() ,
-         array_flip(["SPrate", "NPCbuffer", "GlobalGK", "Customzone", "Customweapon", "Customarmor", "Offlineshop"] ));
-         $server->metaField()->createMany($this->array_combine_(array_keys($metaField),array_values($metaField)));*/
-        $servers = modelServer::join('l2hotzone_devDb_members as member', 'member.id_member', '=', 'servers.user_id')->where('servers.delete_flag','=',0)->where('member.delete_flag','=',0)->get()->toArray();
-
-        return view('backend.list', ['servers'=>$servers]);
-            
-        }
-        
     }
 
     private function array_combine_($keys, $values)
@@ -151,6 +142,7 @@ class AdminController extends Controller
     {
         //modelServer::findOrFail($server_id)->update(['active_status'=>1]);
         modelServer::findOrFail($server_id)->update(['status'=>1]);
+
         return redirect()->back()->with('flash_success', 'Server Activated');
     }
 
@@ -159,6 +151,7 @@ class AdminController extends Controller
         //echo "dd";die;
         //modelServer::findOrFail($server_id)->update(['active_status'=>0]);
         modelServer::findOrFail($server_id)->update(['status'=>0]);
+
         return redirect()->back()->with('flash_success', 'Server Deactivated');
     }
 
@@ -226,7 +219,7 @@ class AdminController extends Controller
             $image = $request->file('banner');
             $file_Name = $image->getClientOriginalName();
 
-            $imgnames = bannerliveadd::where('user_id','=',$uid)->select('liveimages')->get();
+            $imgnames = bannerliveadd::where('user_id', '=', $uid)->select('liveimages')->get();
             // echo $imgname;
             // foreach ($imgnames as $imgname) {
             //     $path = $request->file('banner')->getRealPath();
@@ -240,8 +233,8 @@ class AdminController extends Controller
             //         break;
             //     }
             // }
-            if(isset($image)){
-                if($image->getClientOriginalExtension()=='gif'){
+            if (isset($image)) {
+                if ($image->getClientOriginalExtension() == 'gif') {
                     // $image = $request->file('banner');
                     // $extension = $image->getClientOriginalExtension();
                     // $name = $image->getClientOriginalName();
@@ -253,12 +246,10 @@ class AdminController extends Controller
                     $logo = file_get_contents($path);
                     $base64 = base64_encode($logo);
                     $file_Name = 'data:image/gif;base64,'.$base64;
-                    // echo public_path('images/imagesAdd/'.$file_Name);
+                // echo public_path('images/imagesAdd/'.$file_Name);
                     // die;
                     // $image->move(public_path('images/imagesAdd/'.$file_Name));
-                }
-                else
-                {
+                } else {
                     $image = $request->file('banner');
                     $extension = $image->getClientOriginalExtension();
                     // $image_resize = Image::make($image->getRealPath());
@@ -270,7 +261,6 @@ class AdminController extends Controller
                     $file_Name = 'data:image/'.$extension.';base64,'.$base64;
                 }
             }
-
 
             /*$request->file('banner')->move(
             public_path('images/imagesAdd/'), $imageName
@@ -290,7 +280,7 @@ class AdminController extends Controller
         ->join('l2hotzone_devDb_members', 'l2hotzone_devDb_members.id_member', '=', 'paymenttokens.user_id')
         ->select('paymenttokens.*', 'l2hotzone_devDb_members.member_name')
         ->whereNotNull('paymenttokens.verify')
-        ->where('l2hotzone_devDb_members.delete_flag','=',0)
+        ->where('l2hotzone_devDb_members.delete_flag', '=', 0)
         //->orderby('paymenttokens.created_at','desc')
         ->get()->toArray();
 
@@ -321,7 +311,6 @@ class AdminController extends Controller
 
     public function banner_advertisement_edit($ad_id = '')
     {
-
         $ad_details = DB::table('liveadds')->where('id', $ad_id)->first();
         $servers = modelServer::where('user_id', $ad_details->user_id)->pluck('server_name', 'id')->toArray();
         $addlist = MTextad::select('textads.id', 'Name', 'category', 'cType', 'image', 'cost', 'server_id', 'till_date', 'textad_id', 'liveadds.active_status')->leftjoin('liveadds', 'textads.id', '=', 'liveadds.textad_id')
@@ -387,7 +376,7 @@ class AdminController extends Controller
                      ->join('servers', 'servers.id', '=', 'premiumservers.server_id')
                      ->join('l2hotzone_devDb_members', 'l2hotzone_devDb_members.id_member', '=', 'servers.user_id')
                      ->select('servers.user_id', 'premiumservers.id as main_id', 'servers.id', 'servers.server_name', 'premiumservers.till_date', 'premiumservers.created_at', 'l2hotzone_devDb_members.member_name', 'premiumservers.active_status')
-                     ->where('premiumservers.delete_flag', 0)->where('l2hotzone_devDb_members.delete_flag','=',0)->get();
+                     ->where('premiumservers.delete_flag', 0)->where('l2hotzone_devDb_members.delete_flag', '=', 0)->get();
 
         return view('backend.premium_banner_list')->with('mypre', $mypremium);
     }
@@ -574,16 +563,20 @@ class AdminController extends Controller
             return view('backend.stream_edit', compact('stream_update', 'position', 'a', 'msg'));
         }
     }
+
     public function advertisement_options()
     {
-        $allads = MTextad::where('delete_flag',0)->orderBy('id')->get()->toArray(); 
+        $allads = MTextad::where('delete_flag', 0)->orderBy('id')->get()->toArray();
+
         return view('backend.advertisement-options')->with('allads', $allads);
         //return redirect('costa/stream-advertisement/list');
     }
+
     public function textoptions_create()
     {
         return view('backend.textoption_add');
     }
+
     public function textoptions_save(Request $request)
     {
         $name = $request->name;
@@ -596,7 +589,7 @@ class AdminController extends Controller
         $MTextad->category = $category;
         $MTextad->cType = $ctype;
         $MTextad->cost = $cost;
-        
+
         if ($request->hasFile('banner')) {
             $image = $request->file('banner');
             $file_Name = time().'_'.$image->getClientOriginalName();
@@ -614,19 +607,21 @@ class AdminController extends Controller
         }
 
         //dd($ad_details);die;
-       
-                
-                $MTextad->save();
 
-                return redirect()->route('costa/advertisement-options/list');
+        $MTextad->save();
+
+        return redirect()->route('costa/advertisement-options/list');
 
         //return redirect()->back()->with('flash_success', 'Added successfully');
     }
+
     public function textoptions_edit($text_option_id = '')
     {
         $textoptions = MTextad::where('id', $text_option_id)->first()->toArray();
+
         return view('backend.textoption_edit', ['textoptions'=>$textoptions]);
     }
+
     public function textoptions_update(Request $request)
     {
         $name = $request->name;
@@ -656,18 +651,21 @@ class AdminController extends Controller
 
         return redirect()->back()->with('flash_success', 'Updated successfully');
     }
+
     public function textoptions_active($textoption_id = '')
     {
         MTextad::findOrFail($textoption_id)->update(['status'=>1]);
 
         return redirect()->back()->with('flash_success', 'Text Advertisement Option Activated');
     }
+
     public function textoptions_inactive($textoption_id = '')
     {
         MTextad::findOrFail($textoption_id)->update(['status'=>0]);
 
         return redirect()->back()->with('flash_success', 'Text Advertisement Option Deactivated');
     }
+
     public function textoptions_delete(Request $request)
     {
         $textoption_id = $request->textoption_id;
@@ -675,23 +673,28 @@ class AdminController extends Controller
         echo 'Text Advertisement Option Deleted Successfully';
         die;
     }
+
     public function reviews()
     {
-        $reviews = review::where('delete_flag',0)->orderBy('id')->get()->toArray(); 
+        $reviews = review::where('delete_flag', 0)->orderBy('id')->get()->toArray();
+
         return view('backend.reviews')->with('reviews', $reviews);
     }
-    public function reviews_active($review_id ='')
+
+    public function reviews_active($review_id = '')
     {
         review::findOrFail($review_id)->update(['status'=>1]);
 
         return redirect()->back()->with('flash_success', 'Review Activated');
     }
+
     public function reviews_inactive($review_id = '')
     {
         review::findOrFail($review_id)->update(['status'=>0]);
 
         return redirect()->back()->with('flash_success', 'Review Deactivated');
     }
+
     public function reviews_delete(Request $request)
     {
         $review_id = $request->review_id;
@@ -699,6 +702,7 @@ class AdminController extends Controller
         echo 'Review Deleted Successfully';
         die;
     }
+
     public function check_expired()
     {
         /* $date=date('Y-m-d H:i:s');
@@ -726,103 +730,78 @@ class AdminController extends Controller
 
     public function user_members(Request $request)
     {
+        $server_counter = DB::table('servers')->select('*', DB::raw('COUNT(servers.user_id) as counter'))->where('servers.delete_flag', 0)->groupBy('user_id')->get();
 
-        $server_counter=DB::table('servers')->select('*',DB::raw('COUNT(servers.user_id) as counter'))->where('servers.delete_flag',0)->groupBy('user_id')->get();
-
-        if($request->get('query')!= "")
-        {
-            $searchTerm = $request->get('query');    
-            $members= DB::table('l2hotzone_devDb_members')->where('l2hotzone_devDb_members.delete_flag','=',0)->where('l2hotzone_devDb_members.is_activated',1)->where('member_name', 'like', '%'.$searchTerm.'%')->orWhere('email_address', 'like', '%'.$searchTerm.'%')->paginate(15);
-        } 
-        else
-        {
-            $members= DB::table('l2hotzone_devDb_members')->where('l2hotzone_devDb_members.delete_flag','=',0)->where('l2hotzone_devDb_members.is_activated',1)->paginate(15);
+        if ($request->get('query') != '') {
+            $searchTerm = $request->get('query');
+            $members = DB::table('l2hotzone_devDb_members')->where('l2hotzone_devDb_members.delete_flag', '=', 0)->where('l2hotzone_devDb_members.is_activated', 1)->where('member_name', 'like', '%'.$searchTerm.'%')->orWhere('email_address', 'like', '%'.$searchTerm.'%')->paginate(15);
+        } else {
+            $members = DB::table('l2hotzone_devDb_members')->where('l2hotzone_devDb_members.delete_flag', '=', 0)->where('l2hotzone_devDb_members.is_activated', 1)->paginate(15);
         }
 
-        $usermoney=DB::table('usermoney')->groupBy('user_id')->get();
-        
-        return view('backend.members',['members'=>$members,'server_counter'=> $server_counter,'usermoney'=>$usermoney]);
+        $usermoney = DB::table('usermoney')->groupBy('user_id')->get();
+
+        return view('backend.members', ['members'=>$members, 'server_counter'=> $server_counter, 'usermoney'=>$usermoney]);
 
         // return view('backend.members');
-    } 
+    }
 
     public function serachmembers(Request $request)
     {
-        if($request->page!="")
-        {
+        if ($request->page != '') {
             return redirect('costa/members?query='.$request->get('query').'&page='.$request->get('page'));
         }
         $searchTerm = $request->get('query');
         $members = DB::table('l2hotzone_devDb_members')
-        ->where('l2hotzone_devDb_members.delete_flag','=',0)
-        ->where('l2hotzone_devDb_members.is_activated',1)
-        ->where('member_name', 'like', '%'.$searchTerm.'%') 
-        ->orWhere('email_address', 'like', '%'.$searchTerm.'%') 
+        ->where('l2hotzone_devDb_members.delete_flag', '=', 0)
+        ->where('l2hotzone_devDb_members.is_activated', 1)
+        ->where('member_name', 'like', '%'.$searchTerm.'%')
+        ->orWhere('email_address', 'like', '%'.$searchTerm.'%')
         ->paginate(20);
-        
-        $usermoney=DB::table('usermoney')->groupBy('user_id')->get();
 
-        return view('backend.search_member',compact('members','usermoney'));
+        $usermoney = DB::table('usermoney')->groupBy('user_id')->get();
+
+        return view('backend.search_member', compact('members', 'usermoney'));
     }
 
     public function ban_members(Request $request)
     {
-        $member_id=$request->input('id');
+        $member_id = $request->input('id');
 
-        $user_banned_status= DB::table('l2hotzone_devDb_members')->where('id_member','=',$member_id)->first();
+        $user_banned_status = DB::table('l2hotzone_devDb_members')->where('id_member', '=', $member_id)->first();
 
+        if ($user_banned_status->is_banned == 0) {
+            DB::table('l2hotzone_devDb_members')->where('id_member', '=', $member_id)->update(['is_banned'=>1]);
 
-
-        if($user_banned_status->is_banned==0)
-        {
-            DB::table('l2hotzone_devDb_members')->where('id_member','=',$member_id)->update(['is_banned'=>1]);
-
-            if(modelServer::where('user_id','=',$member_id)->where('is_banned','=',0)->update(['delete_flag' => 1,'is_banned'=>1]))
-            {
+            if (modelServer::where('user_id', '=', $member_id)->where('is_banned', '=', 0)->update(['delete_flag' => 1, 'is_banned'=>1])) {
                 echo  json_encode($user_banned_status->is_banned);
-            }
-            else
-            {
+            } else {
                 echo false;
             }
-        }
-        else if($user_banned_status->is_banned==1)
-        {
-            DB::table('l2hotzone_devDb_members')->where('id_member','=',$member_id)->update(['is_banned'=>0]);
+        } elseif ($user_banned_status->is_banned == 1) {
+            DB::table('l2hotzone_devDb_members')->where('id_member', '=', $member_id)->update(['is_banned'=>0]);
 
-            if(modelServer::where('user_id','=',$member_id)->where('is_banned','=',1)->update(['delete_flag' => 0,'is_banned'=>0]))
-            {
-                 echo  json_encode($user_banned_status->is_banned);
-            }
-            else
-            {
+            if (modelServer::where('user_id', '=', $member_id)->where('is_banned', '=', 1)->update(['delete_flag' => 0, 'is_banned'=>0])) {
+                echo  json_encode($user_banned_status->is_banned);
+            } else {
                 echo false;
             }
         }
 
-        
         //modelServer
-
     }
 
-    public function edit_members($member_id='')
+    public function edit_members($member_id = '')
     {
-        if($member_id!='')
-        {
-            $member_detail=DB::table('l2hotzone_devDb_members')->where(['id_member'=>$member_id])->first();
-            if(!empty($member_detail))
-            {
-                 return view('backend.members_edit',['member_details'=>$member_detail]);
-            }
-            else
-            {
+        if ($member_id != '') {
+            $member_detail = DB::table('l2hotzone_devDb_members')->where(['id_member'=>$member_id])->first();
+            if (! empty($member_detail)) {
+                return view('backend.members_edit', ['member_details'=>$member_detail]);
+            } else {
                 return redirect()->back();
             }
-           
         }
     }
-
-
 
     public function edit_members_details(Request $request)
     {
@@ -832,7 +811,7 @@ class AdminController extends Controller
         //     'member_name'=>'required|unique:l2hotzone_devDb_members|max:255',
         //     'email_address'=>'required|email|unique:l2hotzone_devDb_members',
         //     'password'=>'confirmed'
-        // ]; 
+        // ];
 
         // $messages=[
         //     'member_name.required'=>'Please Enter Member Name',
@@ -841,104 +820,84 @@ class AdminController extends Controller
         //     'email_address.required'=>"Please enter valid email",
         //     'email_address.email'=>'Please enter valid email',
         //     'email_address.unique'=>'This email is already taken, Please use different.',
-        //     'password'=>'Password amd Confirm Password doesn\'t match' 
+        //     'password'=>'Password amd Confirm Password doesn\'t match'
         // ];
 
-        
         // $errors= Validator::make($request->all(),$rules,$messages);
-        
+
         // if($errors->fails())
-        // {    
+        // {
         //       return redirect()->back()->withErrors($errors)->withInput();
         // }
         // else
         // {
-            $member_name=$request->input('member_name');
-            $member_email=$request->input('email_address');
-            $member_id=$request->input('member_id');
-            $member_password=$request->input('password');
+        $member_name = $request->input('member_name');
+        $member_email = $request->input('email_address');
+        $member_id = $request->input('member_id');
+        $member_password = $request->input('password');
 
-            if($member_password == '')
-            {
-
-                $update=DB::table('l2hotzone_devDb_members')->where(['id_member'=>$member_id])->update(['member_name'=>$member_name,'email_address'=>$member_email]);  
-            }
-            else
-            {
-                $member_password = sha1(strtolower($member_name) . $member_password);
-                // $member_password=sha1($member_password);
-                $rules=[ 'password'=>'confirmed|required|string|min:6']; 
-                $messages=[ 'password.required'=>'Enter new password',
+        if ($member_password == '') {
+            $update = DB::table('l2hotzone_devDb_members')->where(['id_member'=>$member_id])->update(['member_name'=>$member_name, 'email_address'=>$member_email]);
+        } else {
+            $member_password = sha1(strtolower($member_name).$member_password);
+            // $member_password=sha1($member_password);
+            $rules = ['password'=>'confirmed|required|string|min:6'];
+            $messages = ['password.required'=>'Enter new password',
                             'password.confirmed'=>'Password and Confirm Password doesn\'t match',
-                            'min.min'=>'Minimum 6 character require' ];
-                // $errors= Validator::make($request->all(),$rules,$messages);
+                            'min.min'=>'Minimum 6 character require', ];
+            // $errors= Validator::make($request->all(),$rules,$messages);
 
-                // if($errors->fails()){ return redirect()->back()->withErrors($errors)->withInput(); }
-                // else{ 
-                    $update=DB::table('l2hotzone_devDb_members')->where(['id_member'=>$member_id])->update(['member_name'=>$member_name,'email_address'=>$member_email,'passwd'=>$member_password]);
-                     // }
-           }
+            // if($errors->fails()){ return redirect()->back()->withErrors($errors)->withInput(); }
+            // else{
+            $update = DB::table('l2hotzone_devDb_members')->where(['id_member'=>$member_id])->update(['member_name'=>$member_name, 'email_address'=>$member_email, 'passwd'=>$member_password]);
+            // }
+        }
 
-          
-
-            if($update)
-            {
-                return redirect()->back()->with('success','Successfully Details Added');
-            }
-            else
-            {
-                 return redirect()->back()->with('error','Something went wrong ! Please try again later');
-            }
+        if ($update) {
+            return redirect()->back()->with('success', 'Successfully Details Added');
+        } else {
+            return redirect()->back()->with('error', 'Something went wrong ! Please try again later');
+        }
         // }
     }
 
-
     public function delete_members_details(Request $request)
     {
-        $user_id=$_POST;
+        $user_id = $_POST;
 
-        $data1  =DB::table('l2hotzone_devDb_members')->where('id_member','=',$user_id['id'])->update(['delete_flag'=>1,'is_banned'=>1,'is_activated'=>0]);
+        $data1 = DB::table('l2hotzone_devDb_members')->where('id_member', '=', $user_id['id'])->update(['delete_flag'=>1, 'is_banned'=>1, 'is_activated'=>0]);
 
-        $data=DB::table('l2hotzone_devDb_members')->where('id_member','=',$user_id['id'])->first();
+        $data = DB::table('l2hotzone_devDb_members')->where('id_member', '=', $user_id['id'])->first();
 
         echo json_encode($data);
     }
 
     public function redirection_server_log()
     {
-        $redirection_counter=DB::table('server_redirect_user_counter')->select('*',DB::raw('COUNT(server_redirect_user_counter.server_id) as counter'))->groupBy('server_id')->get();
+        $redirection_counter = DB::table('server_redirect_user_counter')->select('*', DB::raw('COUNT(server_redirect_user_counter.server_id) as counter'))->groupBy('server_id')->get();
 
-         $servers = modelServer::join('l2hotzone_devDb_members as member', 'member.id_member', '=', 'servers.user_id')->where('servers.delete_flag','=',0)->get()->toArray();
+        $servers = modelServer::join('l2hotzone_devDb_members as member', 'member.id_member', '=', 'servers.user_id')->where('servers.delete_flag', '=', 0)->get()->toArray();
 
-         return view('backend.redirection_server_log',['redirection_counter'=>$redirection_counter,'servers'=>$servers]);
+        return view('backend.redirection_server_log', ['redirection_counter'=>$redirection_counter, 'servers'=>$servers]);
     }
 
     public function update_members_coin_details(Request $request)
     {
-        $userdetails=$request->input('userdata');
+        $userdetails = $request->input('userdata');
 
-        $check_exist_or_not=DB::table('usermoney')->where('user_id','=',$userdetails['user_id'])->first();
+        $check_exist_or_not = DB::table('usermoney')->where('user_id', '=', $userdetails['user_id'])->first();
 
-        if(!empty($check_exist_or_not))
-        {
-                $usermoneyupdate=DB::table('usermoney')->where('id','=',$check_exist_or_not->id)
-                ->update(['amount'=>$userdetails['usercoin'],'created_at'=>NOW(),'updated_at'=>NOW()]);
-        }
-        else
-        {
-                 $usermoneyupdate=DB::table('usermoney')->insert(['user_id'=>$userdetails['user_id'],'amount'=>$userdetails['usercoin'],'created_at'=>NOW(),'updated_at'=>NOW()]);
+        if (! empty($check_exist_or_not)) {
+            $usermoneyupdate = DB::table('usermoney')->where('id', '=', $check_exist_or_not->id)
+                ->update(['amount'=>$userdetails['usercoin'], 'created_at'=>NOW(), 'updated_at'=>NOW()]);
+        } else {
+            $usermoneyupdate = DB::table('usermoney')->insert(['user_id'=>$userdetails['user_id'], 'amount'=>$userdetails['usercoin'], 'created_at'=>NOW(), 'updated_at'=>NOW()]);
         }
 
-        if($usermoneyupdate)
-        {
+        if ($usermoneyupdate) {
             echo true;
-        }
-        else
-        {
+        } else {
             echo false;
         }
-
     }
-
-   
 }

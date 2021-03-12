@@ -322,7 +322,7 @@ $a = 1;
                 <div class="card-body">
                     <div class="form-group">
                         <label for="exampleInputEmail1">Server language</label>
-                        <?php $selectoption = array(); ?>
+                        <?php $selectoption = []; ?>
                         @foreach ($select as $selec)
                             <?php $selectoption[$selec->code] = $selec->lang; ?>
                         @endforeach

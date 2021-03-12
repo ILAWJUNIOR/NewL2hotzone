@@ -4,9 +4,8 @@ namespace App\Providers;
 
 use App\LegacySessionGuard;
 use Illuminate\Auth\AuthManager;
-use Illuminate\Support\Facades\Gate as GateContract;
-
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate as GateContract;
 
 class AuthServiceProvider extends ServiceProvider
 {

@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Http\Request;
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Http\Request;
 
 class LegacySessionGuard extends SessionGuard
 {

@@ -155,7 +155,7 @@
 							</div>
 							<div class="form-group col-md-6">
 								<label for="exampleInputEmail1">{{ trans('lang.server') }} {{ trans('lang.language') }}</label>
-								<?php $selectoption = array(); ?>
+								<?php $selectoption = []; ?>
 								@foreach ($select as $selec)
 								<?php $selectoption[$selec->code] = $selec->lang; ?>
 								@endforeach
