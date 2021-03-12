@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Model\backend\Admin;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request as Input;
 use Illuminate\Support\Facades\Session;
 use Validator;
 
