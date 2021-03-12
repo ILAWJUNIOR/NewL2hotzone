@@ -45,7 +45,7 @@ class freeServer extends FormRequest
             'website'           =>  'required|url',
             'tos1'              =>  'required|in:on',
             'tos2'              =>  'required|in:on',
-            'g-recaptcha-response' => 'required'
+            'g-recaptcha-response' => 'required',
         ];
     }
 
@@ -53,7 +53,7 @@ class freeServer extends FormRequest
     {
         return [
             'server_name.required' => 'A server name needed!',
-            'g-recaptcha-response.required' => 'Robot verification failed, please try again.'
+            'g-recaptcha-response.required' => 'Robot verification failed, please try again.',
 
         ];
     }

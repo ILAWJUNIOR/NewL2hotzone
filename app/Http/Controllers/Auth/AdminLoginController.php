@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Hash;
 use App\Admin;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Hash;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class AdminLoginController extends Controller
 {

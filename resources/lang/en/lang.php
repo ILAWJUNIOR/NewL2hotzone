@@ -1,4 +1,5 @@
 <?php
+
     return[
         'msg' => 'anuj',
         'login'=>'Login',
@@ -142,7 +143,7 @@
         'listed_on_premium_server'=>'Listed on premium servers',
         'add_now'=>'ADD NOW!',
         'instant_approval'=>'Instant approval',
-        //banner folder 
+        //banner folder
         'banner_confirmation_msg'=>'once you confirm this order. the amount will deduct from your wallete will not revert.',
         'days'=>'Days',
         'total_purchase_cost'=>'Total Purchase cost',
@@ -186,14 +187,6 @@
         'server_err_msg'=>'We are sorry but you can post again in 1 hour!',
         'hour'=>'Hour',
         'news_insert_success'=>'News Insert Successfully',
-        'approve'=>'Approve'
-
-
-
-
-
-
-
-
+        'approve'=>'Approve',
 
     ];

@@ -2,9 +2,8 @@
 
 namespace App\Http\Viewcomposers;
 
-use Illuminate\View\View;
-
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class Usermoney
 {

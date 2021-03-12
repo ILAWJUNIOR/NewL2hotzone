@@ -36,13 +36,13 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
-        
+
         $schedule->command('acfreserver:active')->dailyAt('00:00');
         $schedule->command('removepremiumserver:serverpremium')->dailyAt('00:05');
         $schedule->command('checkexpired:expired')->twiceDaily(1, 13);
         $schedule->command('uptimefirstentry:active')->dailyAt('00:00');
         $schedule->command('uptimedata:active')->everyMinute();
-        $schedule->command('serverredirectioncounter:active')->monthlyOn(1,'00:00');
+        $schedule->command('serverredirectioncounter:active')->monthlyOn(1, '00:00');
     }
 
     /**

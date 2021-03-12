@@ -21,7 +21,7 @@ class Server extends Model
         'dropRate', 'safeRate',
         'spRate', 'adenaRate',
         'maxRate', 'language',
-        'desc', 'website', 'active_status', 'delete_flag','status'
+        'desc', 'website', 'active_status', 'delete_flag', 'status',
     ];
 
     public function setDateAttribute($value)
