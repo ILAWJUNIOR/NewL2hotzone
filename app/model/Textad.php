@@ -15,6 +15,6 @@ class Textad extends Model
 
     public function liveadds()
     {
-        return $this->belongsTo('App\model\liveadd', 'id', 'textad_id');
+        return $this->belongsTo(\App\model\liveadd::class, 'id', 'textad_id');
     }
 }
