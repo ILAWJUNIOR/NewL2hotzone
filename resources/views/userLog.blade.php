@@ -1,0 +1,2 @@
+You must be logged in or properly registered to access this area. 
+<a href="{{url('/forum/index.php?action=login&page=dashboard')}}">{{ trans('lang.login') }}</a>|<a href="{{url('/forum/index.php?action=register&page=dashboard')}}">{{ trans('lang.register') }}</a>
