@@ -60,7 +60,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('costa/stream-advertisement/list', 'backend\AdminController@streamlisting');
     Route::get('costa/advertisement-options/list', 'backend\AdminController@advertisement_options');
 
-     Route::get('costa/textoptions/edit/{id}', 'backend\AdminController@textoptions_edit');
+    Route::get('costa/textoptions/edit/{id}', 'backend\AdminController@textoptions_edit');
     Route::post('costa/textoptions_update', 'backend\AdminController@textoptions_update');
     Route::get('costa/textoptions/active/{server}', 'backend\AdminController@textoptions_active');
     Route::get('costa/textoptions/inactive/{server}', 'backend\AdminController@textoptions_inactive');
@@ -73,16 +73,16 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('costa/reviews/delete', 'backend\AdminController@reviews_delete');
 
     //User Manage
-    Route::get('costa/members','backend\AdminController@user_members');
-    Route::post('costa/members/ban','backend\AdminController@ban_members');
-    Route::get('costa/members/edit/{member_id}','backend\AdminController@edit_members');
-    Route::post('costa/members/edit','backend\AdminController@edit_members_details');
-    Route::post('costa/members/delete','backend\AdminController@delete_members_details');
-    Route::post('costa/members/updatecoin','backend\AdminController@update_members_coin_details');
-    Route::get('costa/member_search','backend\AdminController@serachmembers');
+    Route::get('costa/members', 'backend\AdminController@user_members');
+    Route::post('costa/members/ban', 'backend\AdminController@ban_members');
+    Route::get('costa/members/edit/{member_id}', 'backend\AdminController@edit_members');
+    Route::post('costa/members/edit', 'backend\AdminController@edit_members_details');
+    Route::post('costa/members/delete', 'backend\AdminController@delete_members_details');
+    Route::post('costa/members/updatecoin', 'backend\AdminController@update_members_coin_details');
+    Route::get('costa/member_search', 'backend\AdminController@serachmembers');
 
     //Log Management
-    Route::get('costa/redirection_server_list','backend\AdminController@redirection_server_log');
+    Route::get('costa/redirection_server_list', 'backend\AdminController@redirection_server_log');
 });
 /*
 |--------------------------------------------------------------------------
@@ -208,7 +208,6 @@ Route::post('/server/{serverid}/delete', 'server@destroy')->middleware('authenti
 Route::post('/Re-generate_api_key', 'server@new_api_key')->middleware('authenticate')->name('new_api_key');
 // Route::post('/check_ip','ApiController@check_api');
 
-Route::get('/api.php','ApiController@check_api');
+Route::get('/api.php', 'ApiController@check_api');
 
-Route::post('lang','Viewservers@changeLang');
-
+Route::post('lang', 'Viewservers@changeLang');

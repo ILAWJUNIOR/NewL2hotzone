@@ -3,26 +3,25 @@
 namespace App\Http\Controllers;
 
 use App;
-use Log;
-use Auth;
-use Session;
-use App\User;
+use App\model\bannerad;
+use App\model\bannerliveadd;
+use App\model\fieldmeta_value;
+use App\model\paymenttoken;
 // use Redirect;
-use Validator;
-use Carbon\Carbon;
-
+use App\model\Premiumserver as premiumserver;
 use App\model\Server;
 use App\model\stream;
-use App\model\bannerad;
 use App\model\userMoney;
-use App\model\paymenttoken;
-use App\model\bannerliveadd;
-use Illuminate\Http\Request;
-use App\model\fieldmeta_value;
-use Illuminate\Support\Facades\DB;
-use App\model\Premiumserver as premiumserver;
-use Intervention\Image\ImageManagerStatic as Image;
+use App\User;
+use Auth;
+use Carbon\Carbon;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Intervention\Image\ImageManagerStatic as Image;
+use Log;
+use Session;
+use Validator;
 
 class Banneradd extends Controller
 {
@@ -31,7 +30,6 @@ class Banneradd extends Controller
      */
     public function index()
     {
-        
         $bannerAdds = DB::table('bannerads')
         ->leftJoin('bannerliveadds', 'bannerads.id', '=', 'bannerliveadds.bannerad_id')
         ->select('bannerads.*', 'bannerads.id as idc', 'bannerliveadds.*')
@@ -73,8 +71,9 @@ class Banneradd extends Controller
         }
         $text_live_count = DB::table('liveadds')->where('till_date', '>', date('Y-m-d'))->where('active_status', 1)->count();
         $text_add_count = DB::table('textads')->count();
-        $text_free_counter = $text_add_count - $text_live_count ;
-        return view('advertising.advertising', compact('c'),compact('text_free_counter'));
+        $text_free_counter = $text_add_count - $text_live_count;
+
+        return view('advertising.advertising', compact('c'), compact('text_free_counter'));
     }
 
     /**
@@ -82,8 +81,7 @@ class Banneradd extends Controller
      * data.
      */
     public function confirm(Request $request)
-    {            
-    
+    {
         $this->validate($request, [
             'banner' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             'add_location' => 'required|integer',
@@ -101,17 +99,15 @@ class Banneradd extends Controller
             $width = $dimension[$request->input('add_location')]['width'];
         }
 
-    
         $image = $request->file('banner');
         $file_Name = $image->getClientOriginalName();
 
         $uid = Auth::id();
-        $imgnames = bannerliveadd::where('user_id','=',$uid)->select('liveimages')->get();
+        $imgnames = bannerliveadd::where('user_id', '=', $uid)->select('liveimages')->get();
         // echo $imgname;
         foreach ($imgnames as $imgname) {
-            if($imgname->liveimages == $file_Name)
-            {
-                return redirect()->back()->with('success','This image is already Uploaded');
+            if ($imgname->liveimages == $file_Name) {
+                return redirect()->back()->with('success', 'This image is already Uploaded');
                 break;
             }
         }

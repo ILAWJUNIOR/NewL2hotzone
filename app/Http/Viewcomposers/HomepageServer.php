@@ -9,6 +9,5 @@ class HomepageServer
     public function compose(View $view)
     {
         $view->with('count', 25);
-    
     }
 }
