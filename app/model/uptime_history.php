@@ -10,10 +10,10 @@ class uptime_history extends Model
     // protected $casts = [
     //     'date'  => 'd-m-Y',
     // ];
-    protected $table = "uptime_history";
+    protected $table = 'uptime_history';
 
     protected $fillable = [
-        'server_id', 'first_section_status','second_section_status'
+        'server_id', 'first_section_status', 'second_section_status',
 
     ];
 }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use Cookie;
 use Closure;
-use Session;
-use Redirect;
-use Illuminate\Support\Facades\Auth;
+use Cookie;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Auth;
+use Redirect;
+use Session;
 
 class Authenticate
 {
