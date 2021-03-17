@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App;
-use Log;
-use Auth;
-use App\model\userMoney;
 use App\model\paymenttoken;
+use App\model\userMoney;
+use Auth;
 use Illuminate\Http\Request;
+use Log;
 
 class Pay extends Controller
 {
@@ -22,7 +22,6 @@ class Pay extends Controller
             'totalcoins' => 'required|integer',
         ]);
 
-        $amount;
         $coins = (int) $request->input('totalcoins');
 
         if ($coins >= 100) {

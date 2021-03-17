@@ -17,5 +17,4 @@ use Illuminate\Http\Request;
 //     return $request->user();
 // })->middleware('auth:api');
 
-
-Route::get('/api.php','ApiController@check_api');
+Route::get('/api.php', 'ApiController@check_api');
