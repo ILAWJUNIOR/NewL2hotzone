@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use DB;
+use App\model\liveadd;
+use App\model\Textad;
+use App\model\Textad as MTextad;
+use App\model\userMoney;
+// use App\User;
+use App\Rules\Userserver;
 use Auth;
+use Carbon\Carbon;
+use DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Session;
 use Validator;
-// use App\User;
-use Carbon\Carbon;
-use App\model\Textad;
-use App\model\liveadd;
-use App\model\userMoney;
-use App\Rules\Userserver;
-use Illuminate\Http\Request;
-use App\model\Textad as MTextad;
-use Illuminate\Support\Collection;
 
 class Text extends Controller
 {
@@ -27,15 +27,13 @@ class Text extends Controller
         /*$addlist = MTextad::select('textads.id', 'Name', 'category', 'cType', 'image', 'cost', 'server_id', 'till_date', 'textad_id')->leftjoin('liveadds', 'textads.id', '=', 'liveadds.textad_id')
         ->get()->sortBy('till_date')->groupBy('cType')->toArray();
         ksort($addlist);
-         echo "<pre>";print_r($allads);die;*/ 
+         echo "<pre>";print_r($allads);die;*/
 
         $allads = MTextad::query();
         $allads = $allads->with(['liveadds' => function ($query) {
-        $query->whereDate('till_date', '>', date('Y-m-d'))->where(array('active_status'=>1));
-            }]);
-        $addlist = $allads->orderBy('id')->get()->toArray();  
-
-       
+            $query->whereDate('till_date', '>', date('Y-m-d'))->where(['active_status'=>1]);
+        }]);
+        $addlist = $allads->orderBy('id')->get()->toArray();
 
         return view('advertising.text')->with('addlist', $addlist)->with('servers', $server);
     }
@@ -117,7 +115,8 @@ class Text extends Controller
         $textAdd = DB::table('liveadds')
                         ->join('textads', 'liveadds.textad_id', '=', 'textads.id')
                         ->where('liveadds.user_id', '=', Auth::id())
-                        ->where('liveadds.delete_flag',0)->get();
+                        ->where('liveadds.delete_flag', 0)->get();
+
         return view('advertising.textMy')->with('myTextadds', $textAdd);
     }
 }

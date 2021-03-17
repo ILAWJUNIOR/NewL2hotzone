@@ -2,35 +2,31 @@
 
 namespace App\Http\Viewcomposers;
 
-use Auth;
-use Carbon\Carbon;
 use App\model\bannerad;
 use App\model\language;
 use App\model\messages;
 use App\model\voter_list;
-use Illuminate\View\View;
 use App\model\voter_list_history;
-use Session;
+use Auth;
+use Carbon\Carbon;
 use DB;
+use Illuminate\View\View;
+use Session;
 
 class Languaged
 {
     public function compose(View $view)
     {
-
-        if(!Session::has('language_key'))
-        {
-             app()->setLocale('en');
-        }
-        else
-        {
-            $lang_option=Session::get('language_key');
+        if (! Session::has('language_key')) {
+            app()->setLocale('en');
+        } else {
+            $lang_option = Session::get('language_key');
             app()->setLocale($lang_option);
         }
-       
-       /* $allbanner = bannerad::with('livebanner')->orderBy('id')->get();
-        $view->with('imageBanner', $allbanner);
-        $view->with('select', language::get());*/
+
+        /* $allbanner = bannerad::with('livebanner')->orderBy('id')->get();
+         $view->with('imageBanner', $allbanner);
+         $view->with('select', language::get());*/
 
         /*$allbanner = bannerad::query();
         if( Auth::id()!=='')
@@ -67,29 +63,28 @@ class Languaged
 
         $posts = messages::Join('l2hotzone_devDb_members', 'l2hotzone_devDb_members.id_member', '=', 'l2hotzone_devDb_messages.id_member')->where('l2hotzone_devDb_messages.id_board', 2)->orderBy('l2hotzone_devDb_messages.id_msg', 'desc')->take(5)->get();
 
-        $mmrog_news = messages::where('id_board',3)
-                      ->join('l2hotzone_devDb_members','l2hotzone_devDb_members.id_member','=','l2hotzone_devDb_messages.id_member')
+        $mmrog_news = messages::where('id_board', 3)
+                      ->join('l2hotzone_devDb_members', 'l2hotzone_devDb_members.id_member', '=', 'l2hotzone_devDb_messages.id_member')
                       ->orderBy('l2hotzone_devDb_messages.id_msg', 'desc')->take(5)->get();
-       
+
         $view->with('mmrog_news', $mmrog_news);
         $view->with('imageBanner', $allbanner);
         $view->with('banner_count', $banner_count);
         $view->with('select', language::get());
         $view->with('posts', $posts);
 
-        $count_details=DB::table('voter_lists')
+        $count_details = DB::table('voter_lists')
                  ->select('*', DB::raw('count(*) as total_vote'))
                  ->groupBy('server_id')
                  ->get();
-         $view->with('server_total_vote', $count_details);
-         
-         $count_review_details=DB::table('reviews')
+        $view->with('server_total_vote', $count_details);
+
+        $count_review_details = DB::table('reviews')
                  ->select('*', DB::raw('count(*) as total_review'))
                  ->groupBy('server_id')
                  ->get();
-         $view->with('server_total_review', $count_review_details);
+        $view->with('server_total_review', $count_review_details);
 
-        
         $start = new Carbon('first day of this month');
         $last = new Carbon('last day of this month');
 
@@ -117,7 +112,7 @@ class Languaged
 
         /*if(isset($_GET['p']) && $_GET['p'] == 1)
         {
-            
+
         }*/
     }
 }

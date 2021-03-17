@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Session;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Auth;
+use Session;
 
 //session_start();
 class Variableset

@@ -12,7 +12,7 @@ class voter_list extends Model
     // ];
 
     protected $fillable = [
-        'user_id', 'server_id','voter_ip'
+        'user_id', 'server_id', 'voter_ip',
 
     ];
 }

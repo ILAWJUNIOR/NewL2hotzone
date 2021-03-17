@@ -9,7 +9,7 @@ class Servermeta extends Model
     protected $fillable = [
         'metaKey',
         'metaValue',
-        'flag'
+        'flag',
     ];
 
     public $timestamps = false;
